@@ -1,0 +1,13 @@
+{
+  "ID": "46778CB7A2FD4949A845B19EF1A6364B",
+  "ActionKeyword": "winget",
+  "IsGlobal": true,
+  "Name": "Winget",
+  "Author": "cyberrex5",
+  "Version": "1.0.0",
+  "Language": "csharp",
+  "Website": "https://aka.ms/powertoys",
+  "ExecuteFileName": "Community.PowerToys.Run.Plugin.Winget.dll",
+  "IcoPathDark": "Images\\WebSearch.dark.png",
+  "IcoPathLight": "Images\\WebSearch.light.png"
+}
