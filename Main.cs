@@ -70,8 +70,8 @@ namespace Community.PowerToys.Run.Plugin.Winget
                 string arguments = "winget ";
                 results.Add(new Result
                 {
-                    Title = Properties.Resources.plugin_description.Remove(Description.Length - 1, 1),
-                    SubTitle = string.Format(CultureInfo.CurrentCulture, Properties.Resources.plugin_in_browser_name, BrowserInfo.Name ?? BrowserInfo.MSEdgeName),
+                    Title = Properties.Resources.plugin_description,
+                    SubTitle = "via winget CLI",
                     QueryTextDisplay = string.Empty,
                     IcoPath = _iconPath,
                     ProgramArguments = arguments,
@@ -133,15 +133,15 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     if (matches.Count == 5)
                     {
                         nameChars = matches[2].Index - matches[1].Index;
-                        idChars = matches[3].Index - matches[2].Index;
+                        idChars = matches[3].Index - 1 - matches[2].Index;
                         versionChars = matches[4].Index - matches[3].Index;
                     }
                     else if (matches.Count == 6)
                     {
                         nameChars = matches[2].Index - matches[1].Index;
-                        idChars = matches[3].Index - matches[2].Index;
+                        idChars = matches[3].Index - 1 - matches[2].Index;
                         versionChars = matches[4].Index - matches[3].Index;
-                        matchChars = matches[5].Index - matches[4].Index;
+                        matchChars = matches[5].Index - 1 - matches[4].Index;
                     }
                 }
 
@@ -159,22 +159,21 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
                     if (line != string.Empty)
                     {
-                        string name = "_";
-                        string idStr = "_";
-                        string version = "_";
-                        string match = "_";
-                        string source = "_";
+                        string name = string.Empty;
+                        string idStr = string.Empty;
+                        string version = string.Empty;
+                        string match = string.Empty;
+                        string source = string.Empty;
                         try
                         {
-                            // Header: Name                         ID                            Version Übereinstimmung   Quelle
                             // Divide line into 5 parts by split
                             name = line.Substring(0, nameChars).Trim();
                             idStr = line.Substring(nameChars, idChars).Trim();
-                            version = line.Substring(idChars, versionChars).Trim();
+                            version = line.Substring(nameChars + idChars, versionChars).Trim();
                             if (matches.Count == 6)
                             {
-                                match = line.Substring(versionChars, matchChars).Trim();
-                                source = line.Substring(matchChars).Trim();
+                                match = line.Substring(versionChars + nameChars + idChars, matchChars).Trim();
+                                source = line.Substring(matchChars + versionChars + nameChars + idChars).Trim();
                             }
                             else
                             {
@@ -193,8 +192,13 @@ namespace Community.PowerToys.Run.Plugin.Winget
                         }
 
                         string title = $"{name} ({idStr})";
-                        // string subTitle = $"{Properties.Resources.plugin_result_name} {version} ({source}) {match}";
-                        string subTitle = $"";
+                        string subTitle = $"{Properties.Resources.plugin_result_name} {name} [{version}] ({source}) {match}";
+
+                        if (source == string.Empty)
+                        {
+                            subTitle = $"{Properties.Resources.plugin_result_name} {name} [{version}]";
+                        }
+
                         results.Add(new Result
                         {
                             Title = title,
