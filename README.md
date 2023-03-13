@@ -40,3 +40,7 @@ Contributions are welcome! Please see our [contributing guidelines](CONTRIBUTING
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Create your own PowerToys Run Plugin
+
+I wrote an article about that in my blog which might help you to get started: [How to create a PowerToys Run plugin](https://senpai.club/how-to-create-a-powertoys-run-plugin/index.html)
