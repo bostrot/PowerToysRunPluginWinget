@@ -209,12 +209,12 @@ namespace Community.PowerToys.Run.Plugin.Winget
                         {
                             Title = title,
                             SubTitle = subTitle,
-                            QueryTextDisplay = string.Empty,
+                            QueryTextDisplay = name,
                             IcoPath = _iconPath,
-                            ProgramArguments = "winget " + id,
+                            ProgramArguments = idStr,
                             Action = action =>
                             {
-                                Helper.OpenInShell("winget", "install " + idStr, "/");
+                                Helper.OpenInShell("winget", "install " + idStr + " --wait", "/");
 
                                 return true;
                             },
