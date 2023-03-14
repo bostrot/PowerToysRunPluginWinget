@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation
+﻿// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Shapes;
-using System.Xml.Linq;
 using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Library;
 using Wox.Infrastructure;
@@ -46,13 +48,35 @@ namespace Community.PowerToys.Run.Plugin.Winget
             {
                 Key = NotGlobalIfUri,
                 DisplayLabel = Properties.Resources.plugin_global_if_uri,
-                Value = false,
+                Value = true,
             },
         };
 
-        public List<ContextMenuResult> LoadContextMenus(Result selectedResult)
+        private static string installed;
+
+        // constructor
+        public Main()
         {
-            return new List<ContextMenuResult>(0);
+            Process process = new Process();
+
+            process.StartInfo.FileName = "winget";
+            process.StartInfo.Arguments = "list";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+
+            // UTF16 to UTF8
+            output = System.Text.Encoding.UTF8.GetString(
+                System.Text.Encoding.Convert(
+                    System.Text.Encoding.Unicode,
+                    System.Text.Encoding.UTF8,
+                    System.Text.Encoding.Unicode.GetBytes(output)));
+
+            installed = output;
         }
 
         public List<Result> Query(Query query)
@@ -103,8 +127,6 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
                 string output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
-
-                var bytes = System.Text.Encoding.Default.GetBytes(output);
 
                 // UTF16 to UTF8
                 output = System.Text.Encoding.UTF8.GetString(
@@ -179,12 +201,6 @@ namespace Community.PowerToys.Run.Plugin.Winget
                             {
                                 match = string.Empty;
                             }
-
-                            // name = ";" + lines[0].Split("ID")[0].Length.ToString() + ";"; // matches[1].Index;;
-                            // idStr = idChars.ToString();
-                            // version = versionChars.ToString();
-                            // match = matchChars.ToString();
-                            // source = sourceChars.ToString();
                         }
                         catch (Exception e)
                         {
@@ -243,6 +259,74 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     $"Plugin: {Properties.Resources.plugin_name}",
                     errorMsgString);
             };
+        }
+
+        private static List<ContextMenuResult> GetContextMenu(in Result result, in string assemblyName)
+        {
+            if (result?.Title == Properties.Resources.plugin_description)
+            {
+                return new List<ContextMenuResult>(0);
+            }
+
+            var idStr = result?.ProgramArguments;
+            var name = result?.QueryTextDisplay.Replace("winget ", string.Empty);
+
+            List<ContextMenuResult> list = new List<ContextMenuResult>(1)
+            {
+                new ContextMenuResult
+                {
+                    AcceleratorKey = Key.I,
+                    AcceleratorModifiers = ModifierKeys.Control,
+                    Action = _ =>
+                    {
+                        Helper.OpenInShell("winget", "install " + idStr + " -i --force --wait", "/");
+                        return true;
+                    },
+                    FontFamily = "Segoe MDL2 Assets",
+                    Glyph = "\xE70F", // Symbol: Edit
+                    PluginName = assemblyName,
+                    Title = "Forced interactive install (Ctrl+I)",
+                },
+            };
+
+            if (installed.ToLower().Contains(name.ToLower()))
+            {
+                list.Add(new ContextMenuResult
+                {
+                    AcceleratorKey = Key.U,
+                    AcceleratorModifiers = ModifierKeys.Control,
+                    Action = _ =>
+                    {
+                        Helper.OpenInShell("winget", "upgrade " + idStr + " --wait", "/");
+                        return true;
+                    },
+                    FontFamily = "Segoe MDL2 Assets",
+                    Glyph = "\xE777", // Symbol: UpdateRestore
+                    PluginName = assemblyName,
+                    Title = "Upgrade (Ctrl+U)",
+                });
+                list.Add(new ContextMenuResult
+                {
+                    AcceleratorKey = Key.D,
+                    AcceleratorModifiers = ModifierKeys.Control,
+                    Action = _ =>
+                    {
+                        Helper.OpenInShell("winget", "uninstall " + idStr + " --wait", "/");
+                        return true;
+                    },
+                    FontFamily = "Segoe MDL2 Assets",
+                    Glyph = "\xE74D", // Symbol: Delete
+                    PluginName = assemblyName,
+                    Title = "Delete (Ctrl+D)",
+                });
+            }
+
+            return list;
+        }
+
+        public List<ContextMenuResult> LoadContextMenus(Result selectedResult)
+        {
+            return GetContextMenu(selectedResult, "someassemblyname");
         }
 
         public string GetTranslatedPluginTitle()
