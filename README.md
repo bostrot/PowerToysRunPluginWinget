@@ -2,7 +2,7 @@
 
 This is a plugin for [PowerToys Run](https://github.com/microsoft/PowerToys/wiki/PowerToys-Run-Overview) that allows you to search and install packages from the [Winget](https://github.com/microsoft/winget-cli) package manager.
 
-**Note:** This plugin is still a work in progress. It is not yet ready for production use. Installing and finding of winget packages should work.
+![image](https://user-images.githubusercontent.com/7342321/225170051-a6b4bb62-caac-4b12-b9b1-b71681d39954.png)
 
 ## Features
 
