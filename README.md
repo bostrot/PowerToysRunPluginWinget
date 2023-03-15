@@ -1,4 +1,4 @@
-# Winget Plugin for PowerToys Run (WIP)
+# Winget Plugin for PowerToys Run
 
 This is a plugin for [PowerToys Run](https://github.com/microsoft/PowerToys/wiki/PowerToys-Run-Overview) that allows you to search and install packages from the [Winget](https://github.com/microsoft/winget-cli) package manager.
 
