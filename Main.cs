@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation
+﻿// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
@@ -56,6 +57,11 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         // constructor
         public Main()
+        {
+            LoadInstalledList();
+        }
+
+        private static void LoadInstalledList()
         {
             Process process = new Process();
 
@@ -224,8 +230,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                             ProgramArguments = idStr,
                             Action = action =>
                             {
-                                Helper.OpenInShell("winget", "install " + idStr + " --wait", "/");
-
+                                Winget("install " + idStr + " --wait");
                                 return true;
                             },
                         });
@@ -255,6 +260,28 @@ namespace Community.PowerToys.Run.Plugin.Winget
             };
         }
 
+        public static void Winget(string cmd)
+        {
+            // Call thread
+            Thread thread = new Thread(() => WingetCmdThread(cmd));
+            thread.Start();
+        }
+
+        public static void WingetCmdThread(string cmd)
+        {
+            Process process = new Process();
+
+            process.StartInfo.FileName = "winget";
+            process.StartInfo.Arguments = cmd;
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            process.Start();
+
+            // Wait for process to exit
+            process.WaitForExit();
+            LoadInstalledList();
+        }
+
         private static List<ContextMenuResult> GetContextMenu(in Result result, in string assemblyName)
         {
             if (result?.Title == Properties.Resources.plugin_description)
@@ -273,7 +300,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Helper.OpenInShell("winget", "install " + idStr + " -i --force --wait", "/");
+                        Winget("install " + idStr + " -i --force --wait");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -291,7 +318,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Helper.OpenInShell("winget", "upgrade " + idStr + " --wait", "/");
+                        Winget("upgrade " + idStr + " --wait");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -305,7 +332,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Helper.OpenInShell("winget", "uninstall " + idStr + " --wait", "/");
+                        Winget("uninstall " + idStr + " --wait");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
