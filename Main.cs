@@ -369,11 +369,11 @@ namespace Community.PowerToys.Run.Plugin.Winget
         {
             if (theme == Theme.Light || theme == Theme.HighContrastWhite)
             {
-                _iconPath = "Images/WebSearch.light.png";
+                _iconPath = "Images/Winget.light.png";
             }
             else
             {
-                _iconPath = "Images/WebSearch.dark.png";
+                _iconPath = "Images/Winget.dark.png";
             }
         }
 
