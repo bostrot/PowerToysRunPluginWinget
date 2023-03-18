@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -101,12 +101,6 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     ProgramArguments = arguments,
                     Action = action =>
                     {
-                        if (!Helper.OpenCommandInShell(BrowserInfo.Path, BrowserInfo.ArgumentsPattern, arguments))
-                        {
-                            onPluginError();
-                            return false;
-                        }
-
                         return true;
                     },
                 });
