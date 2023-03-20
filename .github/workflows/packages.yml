@@ -1,0 +1,39 @@
+# Workflow that runs every day at 00:00 and checks for new packages
+name: Packages
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - nightly-packages
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout branch nightly-packages
+      - name: Checkout branch nightly-packages
+        uses: actions/checkout@v3
+        with:
+          ref: nightly-packages
+      # Checkout winget-pkgs
+      - name: Checkout winget-pkgs
+        uses: actions/checkout@v3
+        with:
+          repository: microsoft/winget-pkgs
+          path: /winget-pkgs
+      # Run the script
+      - name: Run the script
+        run: |
+          ./updater.ps1
+      # Commit the changes
+      - name: Commit the changes
+        run: |
+          mv /pkgs.json /winget-pkgs/ -Force
+          git config --local user.email "eric@bostrot.com"
+          git config --local user.name "Eric"
+          git add pkgs.json
+          git commit -m "Update pkgs $((Get-Date).ToString(`"yyyy-MM-dd`"))"
+          git push
+          
