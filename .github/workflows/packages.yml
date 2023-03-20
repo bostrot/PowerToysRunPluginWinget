@@ -26,7 +26,7 @@ jobs:
       # Run the script
       - name: Run the script
         run: |
-          ./updater.ps1
+          ./updater.sh
       # Commit the changes
       - name: Commit the changes
         run: |
