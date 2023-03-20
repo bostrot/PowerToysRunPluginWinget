@@ -4,9 +4,6 @@ name: Packages
 on:
   schedule:
     - cron: '0 0 * * *'
-  push:
-    branches:
-      - nightly-packages
 
 jobs:
   check:
@@ -30,6 +27,7 @@ jobs:
       # Commit the changes
       - name: Commit the changes
         run: |
+          cd $GITHUB_WORKSPACE
           mv ./winget-pkgs/pkgs.json . -f
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
