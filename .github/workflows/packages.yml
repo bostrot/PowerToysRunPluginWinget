@@ -10,7 +10,7 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       # Checkout branch nightly-packages
       - name: Checkout branch nightly-packages
@@ -26,16 +26,14 @@ jobs:
       # Run the script
       - name: Run the script
         run: |
-          bash updater.sh
+          ./updater.ps1
       # Commit the changes
       - name: Commit the changes
         run: |
-          cd $GITHUB_WORKSPACE
-          mv ./winget-pkgs/pkgs.json . -f
+          mv ./winget-pkgs/pkgs.json . -Force
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
           git add pkgs.json
-          # Commit with date
-          git commit -m "Update packages $(date +'%Y-%m-%d')"
+          git commit -m "Update pkgs $((Get-Date).ToString(`"yyyy-MM-dd`"))"
           git push
           
