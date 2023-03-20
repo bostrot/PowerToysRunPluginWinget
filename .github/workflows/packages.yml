@@ -34,6 +34,6 @@ jobs:
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
           git add pkgs.json
-          git commit -m "Update pkgs $((Get-Date).ToString(`"yyyy-MM-dd`"))"
+          git commit -m "Update pkgs $((Get-Date).ToString(\"yyyy-MM-dd\"))"
           git push
           
