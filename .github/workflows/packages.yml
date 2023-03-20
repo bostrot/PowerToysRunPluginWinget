@@ -26,11 +26,11 @@ jobs:
       # Run the script
       - name: Run the script
         run: |
-          /bin/bash updater.sh
+          bash updater.sh
       # Commit the changes
       - name: Commit the changes
         run: |
-          mv ./winget-pkgs/pkgs.json . -Force
+          mv ./winget-pkgs/pkgs.json . -f
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
           git add pkgs.json
