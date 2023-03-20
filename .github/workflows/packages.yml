@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: microsoft/winget-pkgs
-          path: /winget-pkgs
+          path: ./winget-pkgs
       # Run the script
       - name: Run the script
         run: |
@@ -30,7 +30,7 @@ jobs:
       # Commit the changes
       - name: Commit the changes
         run: |
-          mv /pkgs.json /winget-pkgs/ -Force
+          mv ./winget-pkgs/pkgs.json . -Force
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
           git add pkgs.json

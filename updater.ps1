@@ -1,11 +1,11 @@
 # Updates winget packages repository
 
 # Checkout repo https://github.com/microsoft/winget-pkgs/tree/master/manifests
-git clone https://github.com/microsoft/winget-pkgs.git
-cd /winget-pkgs
+# git clone https://github.com/microsoft/winget-pkgs.git
+cd ./winget-pkgs
 
 # Create pkgs.json file with [ as first character
-"[" | Out-File -NoNewline -FilePath "/pkgs.json" -Encoding UTF8
+"[" | Out-File -NoNewline -FilePath "./pkgs.json" -Encoding UTF8
 
 # For every folder (a-z)
 foreach ($folder in (Get-ChildItem -Path . -Directory)) {
@@ -28,7 +28,7 @@ foreach ($folder in (Get-ChildItem -Path . -Directory)) {
             # Append to pkgs.json without new line
             $packageString = "{`"name`":`"$packageName`",`"company`":`"$companyName`",`"version`":`"$versionName`"},"
             
-            $packageString | Out-File -NoNewline -FilePath "/pkgs.json" -Encoding UTF8 -Append
+            $packageString | Out-File -NoNewline -FilePath "./pkgs.json" -Encoding UTF8 -Append
 
             # Write-Host "Added $packageName from $companyName with version $versionName"
         }
@@ -36,6 +36,6 @@ foreach ($folder in (Get-ChildItem -Path . -Directory)) {
 }
 
 # Write packages to file in json format
-"]" | Out-File -NoNewline -FilePath "/pkgs.json" -Encoding UTF8 -Append
+"]" | Out-File -NoNewline -FilePath "./pkgs.json" -Encoding UTF8 -Append
 
-cd $GITHUB_WORKSPACE
+cd ../
