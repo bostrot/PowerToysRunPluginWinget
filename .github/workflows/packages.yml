@@ -30,7 +30,6 @@ jobs:
       # Commit the changes
       - name: Commit the changes
         run: |
-          mv ./winget-pkgs/pkgs.json . -Force
           git config --local user.email "eric@bostrot.com"
           git config --local user.name "Eric"
           git add pkgs.json
