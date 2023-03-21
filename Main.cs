@@ -7,8 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Controls;
@@ -27,6 +32,8 @@ namespace Community.PowerToys.Run.Plugin.Winget
     {
         // Should only be set in Init()
         private Action onPluginError;
+
+        private static List<WingetPackage> packagesList;
 
         private const string NotGlobalIfUri = nameof(NotGlobalIfUri);
 
@@ -58,6 +65,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
         // constructor
         public Main()
         {
+            GetPackages();
             LoadInstalledList();
         }
 
@@ -83,6 +91,35 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     System.Text.Encoding.Unicode.GetBytes(output)));
 
             installed = output;
+        }
+
+        public class WingetPackage
+        {
+            public string Name { get; set; }
+
+            public string Company { get; set; }
+
+            public string Version { get; set; }
+        }
+
+        private static async void GetPackages()
+        {
+            // Download packages list
+            var packages = new List<string>();
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync("https://bostrot.github.io/PowerToysRunPluginWinget/pkgs.json");
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            // Allow trailing comma
+            var options = new JsonSerializerOptions
+            {
+                AllowTrailingCommas = true,
+                PropertyNameCaseInsensitive = true,
+            };
+
+            // Parse response to JSON and ignore use lowercase first letter instead of uppercase
+            packagesList = JsonSerializer.Deserialize<List<WingetPackage>>(responseBody, options);
         }
 
         public List<Result> Query(Query query)
@@ -115,126 +152,24 @@ namespace Community.PowerToys.Run.Plugin.Winget
             else
             {
                 string searchTerm = query.Search;
-
-                Process process = new Process();
-
-                process.StartInfo.FileName = "winget";
-                process.StartInfo.Arguments = $"search \"{searchTerm}\"";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-
-                // UTF16 to UTF8
-                output = System.Text.Encoding.UTF8.GetString(
-                    System.Text.Encoding.Convert(
-                        System.Text.Encoding.Unicode,
-                        System.Text.Encoding.UTF8,
-                        System.Text.Encoding.Unicode.GetBytes(output)));
-
-                // If there is no error, iterate through the output and add each line as a result
-                string[] lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-
-                var id = 0;
-
-                int nameChars = 0;
-                int idChars = 0;
-                int versionChars = 0;
-                int matchChars = 0;
-
-                // Regex for words in header
-                string v = lines[0];
-                var matches = Regex.Matches(v, @"\S+");
-
-                if (matches != null)
+                foreach (WingetPackage package in packagesList)
                 {
-                    // Get chars between Name, ID, Version, Matches, Source length including spaces
-                    if (matches.Count == 5)
+                    var idStr = $"{package.Company}.{package.Name}";
+                    if (package.Name.ToLower().Contains(searchTerm.ToLower()) || package.Company.ToLower().Contains(searchTerm.ToLower()))
                     {
-                        nameChars = matches[2].Index - matches[1].Index;
-                        idChars = matches[3].Index - 1 - matches[2].Index;
-                        versionChars = matches[4].Index - matches[3].Index;
-                    }
-                    else if (matches.Count == 6)
-                    {
-                        nameChars = matches[2].Index - matches[1].Index;
-                        idChars = matches[3].Index - 1 - matches[2].Index;
-                        versionChars = matches[4].Index - matches[3].Index;
-                        matchChars = matches[5].Index - 1 - matches[4].Index;
-                    }
-                }
-
-                foreach (string line0 in lines)
-                {
-                    // Skip header
-                    if (id < 2)
-                    {
-                        id++;
-                        continue;
-                    }
-
-                    // Filter non-text, non-number, non-space and non (-_.,) characters
-                    var line = AllowedCharacters().Replace(line0, string.Empty);
-
-                    if (line != string.Empty)
-                    {
-                        string name = string.Empty;
-                        string idStr = string.Empty;
-                        string version = string.Empty;
-                        string match = string.Empty;
-                        string source = string.Empty;
-                        try
-                        {
-                            // Divide line into 5 parts by split
-                            name = line.Substring(0, nameChars).Trim();
-                            idStr = line.Substring(nameChars, idChars).Trim();
-                            version = line.Substring(nameChars + idChars, versionChars).Trim();
-                            if (matches.Count == 6)
-                            {
-                                match = line.Substring(versionChars + nameChars + idChars, matchChars).Trim();
-                                source = line.Substring(matchChars + versionChars + nameChars + idChars).Trim();
-                            }
-                            else
-                            {
-                                match = string.Empty;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            name = e.ToString();
-                        }
-
-                        // Check if result is empty
-                        if (name == string.Empty)
-                        {
-                            continue;
-                        }
-
-                        string title = $"{name} ({idStr})";
-                        string subTitle = $"{Properties.Resources.plugin_result_name} {name} [{version}] ({source}) {match}";
-
-                        if (source == string.Empty)
-                        {
-                            subTitle = $"{Properties.Resources.plugin_result_name} {name} [{version}]";
-                        }
-
                         results.Add(new Result
                         {
-                            Title = title,
-                            SubTitle = subTitle,
-                            QueryTextDisplay = name,
+                            Title = package.Name,
+                            SubTitle = $"by {package.Company} version: {package.Version}",
+                            QueryTextDisplay = idStr,
                             IcoPath = _iconPath,
                             ProgramArguments = idStr,
                             Action = action =>
                             {
-                                Winget("install " + idStr + " --wait");
+                                Winget($"install {idStr} --wait");
                                 return true;
                             },
                         });
-                        id++;
                     }
                 }
             }
