@@ -1,0 +1,5 @@
+;!@Install@!UTF-8!
+Title="PowerToys Run Winget Plugin v0.0.0"
+BeginPrompt="Do you want to install PowerToys Run Winget Plugin v0.0.0 to C:\Program Files\PowerToys\modules\launcher\Plugins\Winget?"
+RunProgram="installer.bat"
+;!@InstallEnd@!

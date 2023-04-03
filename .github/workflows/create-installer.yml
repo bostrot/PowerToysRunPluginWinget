@@ -1,0 +1,44 @@
+# github action workflow to create a windows installer with 7z sfx
+
+name: Create installer
+
+on:
+  push:
+    branches:
+      - nightly
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout branch nightly
+        uses: actions/checkout@v2
+        with:
+          ref: nightly
+      - name: Get latest version
+        id: get_version
+        run: |
+          $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/bostrot/PowerToysRunPluginWinget/releases/latest"
+          $version = $latestRelease.tag_name
+          echo "::set-output name=version::$version"
+      - name: Create installer
+        run: |
+          cd installer
+          # Download latest release
+          $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/bostrot/PowerToysRunPluginWinget/releases/latest"
+          $downloadUrl = $latestRelease.assets.browser_download_url
+          Invoke-WebRequest -Uri $downloadUrl -OutFile "Winget.tmp.zip"
+          Expand-Archive -Path "Winget.tmp.zip" -DestinationPath "Winget.tmp"
+          Move-Item -Path "Winget.tmp\Winget" -Destination Winget
+          # Replace version in config.txt
+          (Get-Content config.txt) -replace 'v0.0.0', "v${{ steps.get_version.outputs.version }}" | Set-Content config.txt
+          # Create a 7z archive
+          7z a Installer.7z Winget installer.bat
+          # Create a 7z sfx installer
+          cmd.exe /c copy /b 7zS.sfx + config.txt + Installer.7z powertoysrun_winget_v${{ steps.get_version.outputs.version }}.exe
+      - name: Upload installer
+        uses: actions/upload-artifact@v2
+        with:
+          name: Installer
+          path: installer\powertoysrun_winget_v${{ steps.get_version.outputs.version }}.exe
