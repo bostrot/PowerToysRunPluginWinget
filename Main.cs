@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation
+﻿// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -108,7 +108,12 @@ namespace Community.PowerToys.Run.Plugin.Winget
             var packages = new List<string>();
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("https://bostrot.github.io/PowerToysRunPluginWinget/pkgs.json");
-            response.EnsureSuccessStatusCode();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
             string responseBody = await response.Content.ReadAsStringAsync();
 
             // Allow trailing comma
