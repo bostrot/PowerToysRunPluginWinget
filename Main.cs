@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -155,7 +155,8 @@ namespace Community.PowerToys.Run.Plugin.Winget
                 foreach (WingetPackage package in packagesList)
                 {
                     var idStr = $"{package.Company}.{package.Name}";
-                    if (package.Name.ToLower().Contains(searchTerm.ToLower()) || package.Company.ToLower().Contains(searchTerm.ToLower()))
+                    if (package.Name.ToLower(CultureInfo.CurrentCulture).Contains(searchTerm.ToLower(CultureInfo.CurrentCulture)) ||
+                        package.Company.ToLower(CultureInfo.CurrentCulture).Contains(searchTerm.ToLower(CultureInfo.CurrentCulture)))
                     {
                         results.Add(new Result
                         {
@@ -245,7 +246,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                 },
             };
 
-            if (installed.ToLower().Contains(name.ToLower()))
+            if (installed.ToLower(CultureInfo.CurrentCulture).Contains(name.ToLower(CultureInfo.CurrentCulture)))
             {
                 list.Add(new ContextMenuResult
                 {
