@@ -14,10 +14,16 @@ foreach ($folder in (Get-ChildItem -Path . -Directory)) {
         # For every package in the company
         foreach ($package in (Get-ChildItem -Path $company.FullName -Directory)) {
             # For every version in the package
-            $latestVersion = 0
+            $latestVersion = [Version]"0.0.0"
             foreach ($version in (Get-ChildItem -Path $package.FullName -Directory)) {
-                # Check if version is greater than latest version with format 1.0.0.0
-                if ($version.Name -gt $latestVersion) {
+                # If version is not convertable to version, skip
+                try {
+                    # Check if version is greater than latest version with format 1.0.0.0
+                    $version = [Version]$version.Name
+                    if ($version -gt $latestVersion) {
+                        $latestVersion = $version
+                    }
+                } catch {
                     $latestVersion = $version.Name
                 }
             }
