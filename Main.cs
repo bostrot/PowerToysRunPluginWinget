@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -65,8 +65,6 @@ namespace Community.PowerToys.Run.Plugin.Winget
         // constructor
         public Main()
         {
-            GetPackages();
-            LoadInstalledList();
         }
 
         private static void LoadInstalledList()
@@ -102,7 +100,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
             public string Version { get; set; }
         }
 
-        private static async void GetPackages()
+        private static async Task GetPackagesAsync()
         {
             // Download packages list
             var packages = new List<string>();
@@ -199,6 +197,9 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     $"Plugin: {Properties.Resources.plugin_name}",
                     errorMsgString);
             };
+
+            GetPackagesAsync().Wait();
+            LoadInstalledList();
         }
 
         public static void Winget(string cmd)
