@@ -13,7 +13,7 @@ This is a plugin for [PowerToys Run](https://github.com/microsoft/PowerToys/wiki
 ## Installation
 
 1. Download the latest release of the Winget Plugin from the [releases page](https://github.com/bostrot/PowerToysRunPluginWinget/releases).
-2. Extract the contents of the zip file to your PowerToys modules directory (usually `C:\Program Files\PowerToys\modules\launcher\Plugins`).
+2. Extract the zip file's contents to your PowerToys modules directory (usually `C:\Program Files\PowerToys\RunPlugins`).
 3. Restart PowerToys.
 
 ## Usage
