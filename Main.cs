@@ -44,6 +44,8 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         public string Description => Properties.Resources.plugin_description;
 
+        public static string PluginID => "46778CB7A2FD4949A845B19EF1A6364B";
+
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>()
         {
             new PluginAdditionalOption()
