@@ -125,7 +125,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
         {
             if (query is null)
             {
-                throw new ArgumentNullException(nameof(query));
+                return new List<Result>();
             }
 
             var results = new List<Result>();
