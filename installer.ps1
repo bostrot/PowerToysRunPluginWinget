@@ -1,7 +1,7 @@
 # PowerShell script that downloads latest release from GitHub and installs it to PowerToys Run plugin folder
 # Usage: .\installer.ps1
 
-$installLocation = "C:\Program Files\PowerToys\modules\launcher\Plugins\Winget"
+$installLocation = "%LOCALAPPDATA%\PowerToys\RunPlugins\Winget"
 
 # Get latest release from GitHub
 $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/bostrot/PowerToysRunPluginWinget/releases/latest"
