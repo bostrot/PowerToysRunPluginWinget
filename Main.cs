@@ -46,6 +46,14 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         public static string PluginID => "46778CB7A2FD4949A845B19EF1A6364B";
 
+        private static string waitStr = "--wait";
+        private static string forceStr = "-force";
+
+        private static string upgradeAllText = string.Format(
+                        CultureInfo.CurrentCulture,
+                        Properties.Resources.plugin_winget_upgrade_all_text,
+                        Properties.Resources.plugin_winget_cmd_upgrade_all);
+
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>()
         {
             new PluginAdditionalOption()
@@ -133,19 +141,32 @@ namespace Community.PowerToys.Run.Plugin.Winget
             // empty query
             if (string.IsNullOrEmpty(query.Search))
             {
-                string arguments = "winget ";
                 results.Add(new Result
                 {
                     Title = Properties.Resources.plugin_description,
-                    SubTitle = "via winget CLI",
+                    SubTitle = Properties.Resources.plugin_via_winget_cli,
                     QueryTextDisplay = string.Empty,
                     IcoPath = _iconPath,
-                    ProgramArguments = arguments,
+                    ProgramArguments = Properties.Resources.plugin_winget_start_cmd,
                     Action = action =>
                     {
                         return true;
                     },
                 });
+                results.Add(new Result
+                {
+                    Title = upgradeAllText,
+                    SubTitle = Properties.Resources.plugin_via_winget_cli,
+                    QueryTextDisplay = string.Empty,
+                    IcoPath = _iconPath,
+                    ProgramArguments = Properties.Resources.plugin_winget_start_cmd,
+                    Action = action =>
+                    {
+                        Winget(Properties.Resources.plugin_winget_cmd_upgrade_all, asAdmin: true);
+                        return true;
+                    },
+                });
+
                 return results;
             }
             else
@@ -166,7 +187,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                             ProgramArguments = idStr,
                             Action = action =>
                             {
-                                Winget($"install {idStr} --wait");
+                                Winget($"install {idStr} {waitStr}");
                                 return true;
                             },
                         });
@@ -198,14 +219,13 @@ namespace Community.PowerToys.Run.Plugin.Winget
             LoadInstalledList();
         }
 
-        public static void Winget(string cmd)
+        public static void Winget(string cmd, bool asAdmin = false)
         {
-            // Call thread
-            Thread thread = new Thread(() => WingetCmdThread(cmd));
+            Thread thread = new Thread(() => WingetCmdThread(cmd, asAdmin));
             thread.Start();
         }
 
-        public static void WingetCmdThread(string cmd)
+        public static void WingetCmdThread(string cmd, bool asAdmin)
         {
             Process process = new Process();
 
@@ -213,7 +233,20 @@ namespace Community.PowerToys.Run.Plugin.Winget
             process.StartInfo.Arguments = cmd;
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-            process.Start();
+            if (asAdmin)
+            {
+                process.StartInfo.Verb = "runas";
+            }
+
+            try
+            {
+                process.Start();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("User aborted UAC dialog");
+                return;
+            }
 
             // Wait for process to exit
             process.WaitForExit();
@@ -222,7 +255,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         private static List<ContextMenuResult> GetContextMenu(in Result result, in string assemblyName)
         {
-            if (result?.Title == Properties.Resources.plugin_description)
+            if (result?.Title == Properties.Resources.plugin_description || result?.Title == upgradeAllText)
             {
                 return new List<ContextMenuResult>(0);
             }
@@ -238,7 +271,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("install " + idStr + " -i --force --wait");
+                        Winget($"install {idStr} -i {forceStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -256,7 +289,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("upgrade " + idStr + " --wait");
+                        Winget($"upgrade {idStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -270,7 +303,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("uninstall " + idStr + " --wait");
+                        Winget($"uninstall {idStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",

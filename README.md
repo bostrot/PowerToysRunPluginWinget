@@ -12,6 +12,16 @@ This is a plugin for [PowerToys Run](https://github.com/microsoft/PowerToys/wiki
 
 ## Installation
 
+Use the installation script `release.ps1`:
+
+```powershell
+.\release.ps1
+```
+
+Then restart PowerToys
+
+**Or manually:**
+
 1. Download the latest release of the Winget Plugin from the [releases page](https://github.com/bostrot/PowerToysRunPluginWinget/releases).
 2. Extract the zip file's contents to your PowerToys modules directory (usually `%LOCALAPPDATA%\Microsoft\PowerToys\RunPlugins`).
 3. Restart PowerToys.
