@@ -141,7 +141,6 @@ namespace Community.PowerToys.Run.Plugin.Winget
             // empty query
             if (string.IsNullOrEmpty(query.Search))
             {
-                string arguments = "winget ";
                 results.Add(new Result
                 {
                     Title = Properties.Resources.plugin_description,
@@ -154,6 +153,20 @@ namespace Community.PowerToys.Run.Plugin.Winget
                         return true;
                     },
                 });
+                results.Add(new Result
+                {
+                    Title = upgradeAllText,
+                    SubTitle = Properties.Resources.plugin_via_winget_cli,
+                    QueryTextDisplay = string.Empty,
+                    IcoPath = _iconPath,
+                    ProgramArguments = Properties.Resources.plugin_winget_start_cmd,
+                    Action = action =>
+                    {
+                        Winget(Properties.Resources.plugin_winget_cmd_upgrade_all, asAdmin: true);
+                        return true;
+                    },
+                });
+
                 return results;
             }
             else
@@ -206,14 +219,13 @@ namespace Community.PowerToys.Run.Plugin.Winget
             LoadInstalledList();
         }
 
-        public static void Winget(string cmd)
+        public static void Winget(string cmd, bool asAdmin = false)
         {
-            // Call thread
-            Thread thread = new Thread(() => WingetCmdThread(cmd));
+            Thread thread = new Thread(() => WingetCmdThread(cmd, asAdmin));
             thread.Start();
         }
 
-        public static void WingetCmdThread(string cmd)
+        public static void WingetCmdThread(string cmd, bool asAdmin)
         {
             Process process = new Process();
 
@@ -221,9 +233,14 @@ namespace Community.PowerToys.Run.Plugin.Winget
             process.StartInfo.Arguments = cmd;
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            if (asAdmin)
+            {
+                process.StartInfo.Verb = "runas";
+            }
+
             try
             {
-            process.Start();
+                process.Start();
             }
             catch (Exception)
             {
@@ -238,7 +255,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         private static List<ContextMenuResult> GetContextMenu(in Result result, in string assemblyName)
         {
-            if (result?.Title == Properties.Resources.plugin_description)
+            if (result?.Title == Properties.Resources.plugin_description || result?.Title == upgradeAllText)
             {
                 return new List<ContextMenuResult>(0);
             }
