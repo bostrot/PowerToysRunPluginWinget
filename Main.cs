@@ -221,7 +221,15 @@ namespace Community.PowerToys.Run.Plugin.Winget
             process.StartInfo.Arguments = cmd;
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            try
+            {
             process.Start();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("User aborted UAC dialog");
+                return;
+            }
 
             // Wait for process to exit
             process.WaitForExit();
