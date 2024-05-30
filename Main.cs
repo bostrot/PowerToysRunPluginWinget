@@ -46,6 +46,14 @@ namespace Community.PowerToys.Run.Plugin.Winget
 
         public static string PluginID => "46778CB7A2FD4949A845B19EF1A6364B";
 
+        private static string waitStr = "--wait";
+        private static string forceStr = "-force";
+
+        private static string upgradeAllText = string.Format(
+                        CultureInfo.CurrentCulture,
+                        Properties.Resources.plugin_winget_upgrade_all_text,
+                        Properties.Resources.plugin_winget_cmd_upgrade_all);
+
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>()
         {
             new PluginAdditionalOption()
@@ -137,10 +145,10 @@ namespace Community.PowerToys.Run.Plugin.Winget
                 results.Add(new Result
                 {
                     Title = Properties.Resources.plugin_description,
-                    SubTitle = "via winget CLI",
+                    SubTitle = Properties.Resources.plugin_via_winget_cli,
                     QueryTextDisplay = string.Empty,
                     IcoPath = _iconPath,
-                    ProgramArguments = arguments,
+                    ProgramArguments = Properties.Resources.plugin_winget_start_cmd,
                     Action = action =>
                     {
                         return true;
@@ -166,7 +174,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                             ProgramArguments = idStr,
                             Action = action =>
                             {
-                                Winget($"install {idStr} --wait");
+                                Winget($"install {idStr} {waitStr}");
                                 return true;
                             },
                         });
@@ -238,7 +246,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("install " + idStr + " -i --force --wait");
+                        Winget($"install {idStr} -i {forceStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -256,7 +264,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("upgrade " + idStr + " --wait");
+                        Winget($"upgrade {idStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",
@@ -270,7 +278,7 @@ namespace Community.PowerToys.Run.Plugin.Winget
                     AcceleratorModifiers = ModifierKeys.Control,
                     Action = _ =>
                     {
-                        Winget("uninstall " + idStr + " --wait");
+                        Winget($"uninstall {idStr} {waitStr}");
                         return true;
                     },
                     FontFamily = "Segoe MDL2 Assets",

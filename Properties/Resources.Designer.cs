@@ -140,5 +140,41 @@ namespace Community.PowerToys.Run.Plugin.Winget.Properties {
                 return ResourceManager.GetString("plugin_search_failed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die via winget CLI ähnelt.
+        /// </summary>
+        public static string plugin_via_winget_cli {
+            get {
+                return ResourceManager.GetString("plugin_via_winget_cli", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die update --all --source winget ähnelt.
+        /// </summary>
+        public static string plugin_winget_cmd_upgrade_all {
+            get {
+                return ResourceManager.GetString("plugin_winget_cmd_upgrade_all", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die winget  ähnelt.
+        /// </summary>
+        public static string plugin_winget_start_cmd {
+            get {
+                return ResourceManager.GetString("plugin_winget_start_cmd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Upgrade all winget packages ({0}) ähnelt.
+        /// </summary>
+        public static string plugin_winget_upgrade_all_text {
+            get {
+                return ResourceManager.GetString("plugin_winget_upgrade_all_text", resourceCulture);
+            }
+        }
     }
 }

@@ -145,4 +145,16 @@
   <data name="plugin_search_failed" xml:space="preserve">
     <value>Failed to open {0}.</value>
   </data>
+  <data name="plugin_via_winget_cli" xml:space="preserve">
+    <value>via winget CLI</value>
+  </data>
+  <data name="plugin_winget_cmd_upgrade_all" xml:space="preserve">
+    <value>update --all --source winget</value>
+  </data>
+  <data name="plugin_winget_start_cmd" xml:space="preserve">
+    <value>winget </value>
+  </data>
+  <data name="plugin_winget_upgrade_all_text" xml:space="preserve">
+    <value>Upgrade all winget packages ({0})</value>
+  </data>
 </root>
