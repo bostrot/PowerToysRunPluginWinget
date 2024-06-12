@@ -15,7 +15,7 @@ This is a plugin for [PowerToys Run](https://github.com/microsoft/PowerToys/wiki
 Use the installation script `release.ps1`:
 
 ```powershell
-.\release.ps1
+.\installer.ps1
 ```
 
 Then restart PowerToys
