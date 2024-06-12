@@ -3,7 +3,7 @@
 
 
 $version = "1.3.0"
-$release = "C:\Users\erict\Downloads\winget-powertoys-$version.zip"
+$release = "$env:USERPROFILE\Downloads\winget-powertoys-$version.zip"
 $installLocation = "$env:LOCALAPPDATA\PowerToys\RunPlugins\Winget"
 
 # Unzip latest release
